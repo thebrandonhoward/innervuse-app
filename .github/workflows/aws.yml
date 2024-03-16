@@ -1,0 +1,31 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# GitHub recommends pinning actions to a commit SHA.
+# To get a newer version, you will need to update the SHA.
+# You can also reference a tag or branch, but the action may change without warning.
+
+name: Publish AWS from Docker image
+
+# Only trigger, when the build workflow succeeded
+on:
+  workflow_run:
+    workflows: ["Publish Docker image"]
+    types:
+      - completed
+
+jobs:
+
+  build:
+  
+    runs-on: self-hosted
+    
+    steps:
+      - name: Pull Docker Image
+        run: sudo docker pull thathrilla/innervuse-app:main
+      - name: Delete old docker container
+        run: sudo docker rm -f innervuse-app-container || true
+      - name: Run docker container
+        run: sudo docker run -d -p 8080:8080 --name innervuse-app-container thathrilla/innervuse-app
